@@ -1,0 +1,18 @@
+logging.level.org.apache.kafka: WARN
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      auto-offset-reset: latest
+      group-id: com.github.hey-johnnypark-kafka-latency-meter
+      enable-auto-commit: true
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+kafka:
+  topic: in
+  messageSize: 1024
+  numMessages: 1000
+  ratePerSecond: 200
