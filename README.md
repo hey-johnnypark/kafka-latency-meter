@@ -56,10 +56,10 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
 kafka:
-  topic: in # Topic to measure the latency for
-  messageSize: 1024 # Size of test messages in bytes
-  numMessages: 1000 # Number of messages 
-  ratePerSecond: 200 # Max produce rate
+  topic: in           # Topic to measure the latency for
+  messageSize: 1024   # Size of test messages in bytes
+  numMessages: 1000   # Number of messages 
+  ratePerSecond: 200  # Max produce rate
 ```
 
 
