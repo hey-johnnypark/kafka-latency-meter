@@ -5,7 +5,7 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       auto-offset-reset: latest
-      group-id: com.github.hey-johnnypark-kafka-latency-meter
+      group-id: kafka-latency-meter
       enable-auto-commit: true
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
     producer:
@@ -14,5 +14,5 @@ spring:
 kafka:
   topic: in
   messageSize: 1024
-  numMessages: 1000
-  ratePerSecond: 200
+  numMessages: 10000
+  ratePerSecond: 500

@@ -7,14 +7,13 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MetricMeter {
 
-  private static String NUM_MESSAGES_RECEIVED = "num-messages-received";
-
-  private static String MESSAGES_LATENCY = "messages-latency";
+  private static String ROUNDTRIP_LATENCY_TEMPLATE = "roundtrip-latency-topic[%s]";
 
   private Map<String, Long> records = new ConcurrentHashMap<>();
 
@@ -22,8 +21,14 @@ public class MetricMeter {
 
   private ConsoleReporter reporter;
 
+  @Value("${kafka.topic}")
+  private String topic;
+
+  private String key;
+
   @PostConstruct
   private void init() {
+    key = String.format(ROUNDTRIP_LATENCY_TEMPLATE, topic);
     reporter = ConsoleReporter
         .forRegistry(metrics)
         .convertRatesTo(TimeUnit.SECONDS)
@@ -41,7 +46,7 @@ public class MetricMeter {
         .ofNullable(records.get(msgId))
         .ifPresent(time -> {
           metrics
-              .timer(MESSAGES_LATENCY)
+              .timer(key)
               .update(System.currentTimeMillis() - time, TimeUnit.MILLISECONDS);
         });
   }
