@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class RateLimitedProducerService {
 
   private static final Logger LOG = LoggerFactory.getLogger(App.class);
+  public static final int NUM_STEPS = 20;
 
   @Value("${kafka.topic}")
   private String topic;
@@ -42,10 +43,21 @@ public class RateLimitedProducerService {
   @Autowired
   private KafkaTemplate<String, byte[]> template;
 
+  private ProgressReporter reporter;
+
   @PostConstruct
   public void postConstruct() {
+    initRateLimiter();
+    initMockMessage();
+    initProgressLogger();
+  }
+
+  private void initProgressLogger() {
+    reporter = new ProgressReporter(numMessages);
+  }
+
+  private void initRateLimiter() {
     rateLimiter = RateLimiter.create(ratePerSecond);
-    generateMessage();
   }
 
   @Async
@@ -59,13 +71,14 @@ public class RateLimitedProducerService {
         .mapToObj(this::createProducerRecord)
         .peek(this::registerRecord)
         .peek(this::sendRecord)
+        .peek(reporter::progress)
         .peek(this::rateLimit)
         .count();
-    LOG.info("Produced {} messages", count);
+    LOG.info("Done producing {} messages", count);
     return CompletableFuture.completedFuture(count);
   }
 
-  private void generateMessage() {
+  private void initMockMessage() {
     message = new byte[messageSize];
     new Random().nextBytes(message);
     LOG.info("Generated message with {} bytes", message.length);
@@ -88,6 +101,30 @@ public class RateLimitedProducerService {
   private ProducerRecord registerRecord(ProducerRecord<String, byte[]> record) {
     metricMeter.onMessageOut(record.key());
     return record;
+  }
+
+  private class ProgressReporter {
+
+    private int currentProgress = 0;
+
+    private final int end;
+
+    private final int step;
+
+    private ProgressReporter(int end) {
+      this.end = end;
+      step = end / NUM_STEPS;
+    }
+
+    private void progress(ProducerRecord record) {
+      if (++currentProgress % step == 0) {
+        LOG.info("Produced {}/{} messages ({}%)",
+            currentProgress,
+            end,
+            (int)((float) currentProgress / (float) end * 100));
+      }
+    }
+
   }
 
 }

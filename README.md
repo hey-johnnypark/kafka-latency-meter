@@ -2,7 +2,11 @@
 
 > Measures the latency of a Kafka topic
 
+
+
 ## Getting started
+
+
 
 <b>Optional</b>: Start Kafka in Docker
 ```bash
