@@ -7,19 +7,25 @@
 ## Getting started
 
 
+**What you’ll need**
+* About 5 minutes
+* Java 1.8 or later
+* wget
+
+
+
 
 <b>Optional</b>: Start Kafka in Docker
 ```bash
 docker run --name broker --rm -p 2181:2181 -p 9092:9092 -e ADVERTISED_HOST=127.0.0.1 johnnypark/kafka-zookeeper
 ```
 
-Checkout, build and run kafka-latency-meter
+Download and run kafka-latency-meter
 ```bash
-$ git clone https://github.com/hey-johnnypark/kafka-latency-meter.git && \
-  cd kafka-latency-meter && \
-  mvn clean install && \
-  java -jar target/kafka-latency-meter.jar --kafka.topic=foobar
-
+wget https://github.com/hey-johnnypark/kafka-latency-meter/releases/download/v1.0/kafka-latency-meter.jar && \
+java -jar kafka-latency-meter.jar \ 
+--kafka.topic=foobar \
+--spring.kafka.bootstrap-servers=localhost:9092
 -- Timers ----------------------------------------------------------------------
 roundtrip-latency-topic[foobar]
              count = 10000
@@ -42,8 +48,8 @@ roundtrip-latency-topic[foobar]
 
 ## Features
 
-* Measures roundtrip latency for a single kafka topic
-* Latency test can be parametrized 
+* Measures roundtrip latency for a single Kafka topic
+* Latency test can be parametrized
 
 ## Configuration
 
